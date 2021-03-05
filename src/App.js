@@ -1,0 +1,40 @@
+import "./styles.css";
+import React, { useState } from "react";
+import useFetchJob from "./useFetchJob";
+import { Container } from "react-bootstrap";
+import Job from "./Job";
+import SearchForm from "./SearchForm";
+import JobsPagination from "./JobsPagination";
+export default function App() {
+  const [params, setParams] = useState({});
+  const [page, setPage] = useState(1);
+  const { jobs, error, loading, hasNextPage } = useFetchJob(params, page);
+  function handleParamChange(e) {
+    const param = e.target.name;
+    const value = e.target.value;
+    setPage(1);
+    setParams((prevParams) => {
+      return { ...prevParams, [param]: value };
+    });
+  }
+  return (
+    <div className="App">
+      <Container className="my-4">
+        <h1>Github Jobs</h1>
+        <SearchForm params={params} onParamChange={handleParamChange} />
+
+        <JobsPagination
+          page={page}
+          setPage={setPage}
+          hasNextPage={hasNextPage}
+        />
+        {loading && <h1>Loading...</h1>}
+        {error && <h1>Error. Try Refreshing.</h1>}
+        {jobs.map((job) => {
+          return <Job key={job.id} jobs={job} />;
+        })}
+        {error && <h1>Error</h1>}
+      </Container>
+    </div>
+  );
+}
